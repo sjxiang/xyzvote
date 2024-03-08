@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>xyz 投票网站</title>
+</head>
+<body>
+<main>
+    <h1>所有投票活动如下：</h1>
+
+    <!-- 在 tmpl 中，使用遍历 -->
+    {{range $key,$value := .vote}}
+    <h2><a href="/api/v1/vote?id={{$value.Id}}">{{$value.Title}}</a></h2>
+    {{end}}
+
+    
+</main>
+</body>
+</html>

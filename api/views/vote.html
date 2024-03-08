@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>xyz 投票网站</title>
+</head>
+<body>
+<main>
+    <h1>投票详情</h1>
+
+    <h2>title: {{.vote.Title}}</h2>
+    <h2>id: {{.vote.Id}}</h2>
+    <h2>UserId: {{.vote.UserId}}</h2>
+    <h2>Type: {{.vote.Type}}</h2>
+    <h2>Status: {{.vote.Status}}</h2>
+
+    <h1>选项详情</h1>
+
+    {{range $key,$value := .options}}
+        <h2>--- 分隔符 ---</h2>
+        <h3>option: {{$value.Name}}</h3>
+        <h3>count: {{$value.Count}}</h3>
+    {{end}}
+
+</main>
+</body>
+</html>
