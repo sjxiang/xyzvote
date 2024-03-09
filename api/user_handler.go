@@ -53,7 +53,7 @@ func (h *UserHandler) DoLogin(c *gin.Context)  {
 
 		// 数据库查询失败
 		c.JSON(http.StatusBadGateway, gin.H{
-			"msg": "查询失败",
+			"msg": "db 查询失败",
 		})
 		return
 	}
@@ -78,7 +78,7 @@ func (h *UserHandler) Admin(c *gin.Context)  {
 	result, err := h.userStore.GetUsers(context.Background())
 	if err != nil {
 		c.JSON(http.StatusBadGateway,  gin.H{
-			"msg": "查询失败",
+			"msg": "db 查询失败",
 		})
 		return
 	}

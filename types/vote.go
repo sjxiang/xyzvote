@@ -51,3 +51,11 @@ type VoteParams struct {
 	VoteId       int64     `json:"vote_id"`
 	VoteOptions  []int64   `json:"vote_options"`
 }
+
+type UpdateVoteParams struct {
+
+}
+
+type UpdateOptionParams struct {
+    
+}

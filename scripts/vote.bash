@@ -14,5 +14,10 @@ credentials=sjxiang
 cookie='credentials=sjxiang; path=/;'
 
 # Send the POST request with the JSON payload and cookie using curl
-curl -s -X POST -H "Content-Type: application/json" -H "Cookie: $cookie" -d "$payload" "$url"
+curl -s \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "Cookie: $cookie" \
+  -d "$payload" \
+  "$url"
 

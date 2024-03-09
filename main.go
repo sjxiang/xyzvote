@@ -24,14 +24,10 @@ func main() {
 
 	var (
 		userStore   = db.NewMySQLUserStore(storage)
-		voteStore   = db.NewMySQLVoteStore(storage, userStore)
-		store       = db.Store{
-			User: userStore,
-			Vote: voteStore,
-		}
+		voteStore   = db.NewMySQLVoteStore(storage)
 		
 		userHandler = api.NewUserHandler(userStore)
-		voteHandler = api.NewVoteHandler(store)
+		voteHandler = api.NewVoteHandler(voteStore, userStore)
 		
 		app         = gin.Default()
 		apiv1       = app.Group("/api/v1")
@@ -45,8 +41,13 @@ func main() {
 	apiv1.Use(userHandler.Check())
 
 	apiv1.GET("/index", voteHandler.Index)
-	apiv1.GET("/vote", voteHandler.GetVoteInfo)
+	apiv1.GET("/vote", voteHandler.GetVote)
 	apiv1.POST("/vote", voteHandler.DoVote)
+
+	apiv1.POST("/vote/add", voteHandler.AddVote)
+	apiv1.PUT("/vote/update", voteHandler.UpdateVote)
+	apiv1.DELETE("/vote/del", voteHandler.DelVote)
+	
 	apiv1.GET("/admin", userHandler.Admin)
 
 	app.Run(":8080")

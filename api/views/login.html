@@ -3,15 +3,23 @@
 <head>
     <meta charset="utf-8">
     <title>xyz 投票网站</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 </head>
 <body>
 <main class="main">
     <form method="post" action="/api/v1/login">
-        <input type="text" name="username" placeholder="Your name">
-        <input type="password" name="password" placeholder="Password">
-        <button type="submit">Sign in</button>
-        <!-- 登录 -->
+        <input name="username" type="text"     placeholder="输入账号"/>
+        <input name="password" type="password" placeholder="输入密码"/>
+        <input type="submit" value="登录">
+
+        <!-- <button type="submit">登录</button> -->
     </form>
+
+    <br/>
+    <a href="http://localhost:8080/auth/begin?provider=github">使用 Github 登录</a>
+    
 </main>
 </body>
 </html>
