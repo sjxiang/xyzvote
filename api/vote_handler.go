@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	
-	"github.com/go-sql-driver/mysql"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
@@ -63,7 +62,7 @@ func (h *VoteHandler) DoVote(c *gin.Context)  {
 	// c 上下文
 	username := c.MustGet("creds").(string)
 
-	result, err := h.userStore.GetUserByUsername(context.Background(), username)
+	user, err := h.userStore.GetUserByUsername(context.Background(), username)
 	if err != nil {
 		// 检查 ErrRecordNotFound 错误
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -80,21 +79,30 @@ func (h *VoteHandler) DoVote(c *gin.Context)  {
 		return
 	}
 
-	err = h.voteStore.InsertUserVoteRecord(context.Background(), result.UserId, params.VoteId, params.VoteOptions)
+	/*
+		防止刷票
+	 */
+	result, err := h.voteStore.GetUserVoteRecord(context.Background(), user.UserId, params.VoteId)
 	if err != nil {
-		// 检查唯一索引约束 Error 1062 (23000): Duplicate entry
-		const uniqueViolation uint16 = 1062  
+		c.JSON(http.StatusBadGateway, gin.H{
+			"msg": "db 操作失败",
+		})
+		return
+	}
+	if len(result) >= 1 {
+		c.JSON(http.StatusConflict, gin.H{
+			"msg": "您已经投过票",
+		})
+		return
+	}
 
-		if mysqlErr, ok := err.(*mysql.MySQLError); ok {
-			switch mysqlErr.Number {
-			case uniqueViolation: 
-				c.JSON(http.StatusConflict, gin.H{
-					"msg": "db 操作失败",
-				})
-				return
-			}
-		}
-
+	/*
+		由于 vote_opt 是对已有选项计数， +1
+		vote_opt_user 是新增用户投票记录，可单选或者多选
+		故，无冲突
+	 */
+	err = h.voteStore.InsertUserVoteRecord(context.Background(), user.UserId, params.VoteId, params.VoteOptions)
+	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{
 			"msg": "db 操作失败",
 		})
@@ -107,18 +115,7 @@ func (h *VoteHandler) DoVote(c *gin.Context)  {
 }
 
 
-func (h *VoteHandler) AddVote(c *gin.Context) {
 
-
-}
-
-func (h *VoteHandler) UpdateVote(c *gin.Context) {
-
-}
-
-func (h *VoteHandler) DelVote(c *gin.Context) {
-
-}
 
 
 func (h *VoteHandler) GetVote(c *gin.Context)  { 

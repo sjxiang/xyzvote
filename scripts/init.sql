@@ -1,7 +1,7 @@
 
 SHOW DATABASES;
 
-CREATE DATABASE IF NOT EXISTS `xyz_vote` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
+CREATE DATABASE IF NOT EXISTS `xyz_vote`;
 
 USE `xyz_vote`;
 
@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
     `id`         bigint(20) NOT NULL AUTO_INCREMENT,
-    `user_id`    bigint(20) NOT NULL DEFAULT '0',
+    `user_id`    varchar(64) NOT NULL DEFAULT '',
     `username`   varchar(64) NOT NULL DEFAULT '',
     `password`   varchar(64) NOT NULL DEFAULT '',
     `email`      varchar(64) NOT NULL DEFAULT '',
@@ -25,9 +25,15 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT = '用户表';
 
 
-INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
-VALUES (10001, "sjxiang", "shgqmrf19", "1535484943@qq.com");
+-- INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
+-- VALUES (10001, "sjxiang1997", "shgqmrf19", "1535484943@qq.com");
 
+-- INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
+-- VALUES (10002, "admin123", "123456qwe", "test@qq.com");
+
+
+-- INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
+-- VALUES (10004, "admin123", "123456qwe", "test@qq.com");
 
 CREATE TABLE `vote` ( 
     `id`         bigint NOT NULL AUTO_INCREMENT, 
@@ -75,7 +81,7 @@ VALUES ("shaxian", 0, 1, NOW(), NOW());
 
 CREATE TABLE `vote_opt_user` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
-    `user_id` bigint DEFAULT NULL COMMENT '用户', 
+    `user_id` varchar(64) DEFAULT NULL COMMENT '用户',
     `vote_id` bigint DEFAULT NULL COMMENT '投票项目', 
     `vote_option_id` bigint DEFAULT NULL COMMENT '投票选项', 
     `created_at` datetime DEFAULT NULL COMMENT '投票时间',  

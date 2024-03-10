@@ -3,7 +3,7 @@
 # 登录 MySQL 控制台
 # docker exec -it mysql sh
 # mysql -uroot -p
-# my-secret-p
+# my-secret-pw
 
 # 登录 Redis 控制台
 # docker exec -it redis sh

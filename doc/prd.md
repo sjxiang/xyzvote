@@ -26,6 +26,17 @@ http://www.gotool.top/handlesql/sql2gorm
 
 # gorm
 
+First 不会报错
+
+用户注册，先查询是否注册过，日志告警 record not found，即使错误处理的漂亮，也没卵用
+
+Find 
+
+优缺点
+
+
+约束 unique 冲突告警，还是通过查询判重
+
 
 # crud
 
@@ -36,4 +47,14 @@ http://www.gotool.top/handlesql/sql2gorm
 
 上述三条，已经非常清楚了，可以换工作或者调岗
 
-# 
+
+
+# 验证码
+
+1. 用处？风控，判断脚本还是人工
+2. 常见验证码？图片、拖拽 ...
+3. 原理？
+后端生成 captcha_id 和 answer 以及基于 answer 生成的 base64 字符串；
+前端拿到 captcha_id 和 base64 字符串，渲染成图片；
+用户输入。
+

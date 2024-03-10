@@ -5,20 +5,22 @@
 </head>
 <body>
 <main>
-    <h1>投票详情</h1>
+    <h2>投票详情</h2>
 
-    <h2>标题 {{.vote.Title}}</h2>
-    <h2>号召人 {{.vote.UserId}}</h2>
-    <h2>单选/多选 {{.vote.Type}}</h2>
-    <h2>进行中/超出期限 {{.vote.Status}}</h2>
+    <h6>标题 {{.vote.Title}}</h6>
+    <h6>号召人 {{.vote.UserId}}</h6>
+    <h6>单选/多选 {{.vote.Type}}</h6>
+    <h6>进行中/超出期限 {{.vote.Status}}</h6>
 
-    <h1>选项详情</h1>
+    <br/>
+
+    <h2>选项详情</h2>
 
     {{range $key,$value := .options}}
-        <h2>--- 分隔符 ---</h2>
         <h6>编号 {{$value.Id}} </h6>
         <h6>选项名称 {{$value.Name}}</h6>
         <h6>投票数 {{$value.Count}}</h6>
+        <br/>
     {{end}}
 
 </main>

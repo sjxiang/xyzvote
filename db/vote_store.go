@@ -14,11 +14,16 @@ type VoteStore interface {
 	GetVotes(ctx context.Context) ([]*types.Vote, error)
 	GetVoteByID(ctx context.Context, id int64) (*types.Vote, error) 
 	GetOptionsByVoteID(ctx context.Context, voteId int64) ([]*types.VoteOption, error)
-	InsertUserVoteRecord(ctx context.Context, userId, voteId int64, options []int64) error
+	GetUserVoteRecord(ctx context.Context, userId string, voteId int64) ([]*types.VoteOptionByUser, error)
+
+	InsertUserVoteRecord(ctx context.Context, userId string, voteId int64, options []int64) error
 	InsertVoteAndOption(ctx context.Context, vote types.Vote, options []types.VoteOption) error
+
 	UpdateVote(ctx context.Context, params types.UpdateVoteParams) error
 	UpdateOption(ctx context.Context, params types.UpdateOptionParams) error
+	
 	DeleteVote(ctx context.Context, voteId int64) error
+	EndVote(ctx context.Context) error 
 }
 
 type MySQLVoteStore struct {
@@ -60,8 +65,8 @@ func (s *MySQLVoteStore) GetOptionsByVoteID(ctx context.Context, voteId int64) (
 	return items, err
 }
 
-// 新建用户投票纪录
-func (s *MySQLVoteStore) InsertUserVoteRecord(ctx context.Context, userId, voteId int64, options []int64) error {
+// 新建用户投票记录
+func (s *MySQLVoteStore) InsertUserVoteRecord(ctx context.Context, userId string, voteId int64, options []int64) error {
 
 	if err := s.storage.Transaction(func(tx *gorm.DB) error {
 
@@ -162,6 +167,7 @@ func (s *MySQLVoteStore) InsertVoteAndOption(ctx context.Context, vote types.Vot
 
  */
 
+ 
 func (s *MySQLVoteStore) UpdateVote(ctx context.Context, params types.UpdateVoteParams) error {
 	return s.storage.Table("vote").Save(&params).Error 
 }
@@ -178,12 +184,12 @@ func (s *MySQLVoteStore) DeleteVote(ctx context.Context, voteId int64) error {
 			return err 
 		}
 
-		// 2. 删除该项问卷调查选项
+		// 2. 删除该项问卷调查相关选项
 		if err := tx.Delete(&types.VoteOption{}).Where("vote_id = ?", voteId).Error; err != nil {
 			return err 
 		}
 
-		// 3. 删除该项问卷调查投票记录
+		// 3. 删除该项问卷调查所有投票记录
 		if err := tx.Delete(&types.VoteOptionByUser{}).Where("vote_id = ?", voteId).Error; err != nil {
 			return err 
 		}
@@ -191,6 +197,45 @@ func (s *MySQLVoteStore) DeleteVote(ctx context.Context, voteId int64) error {
 		return nil 
 	}); err != nil {
 		return err 
+	}
+
+	return nil 
+}
+
+// 获取用户投票记录，GetUserVoteHistory
+func (s *MySQLVoteStore) GetUserVoteRecord(ctx context.Context, userId string, voteId int64) ([]*types.VoteOptionByUser, error) {
+	var (
+		items []*types.VoteOptionByUser
+		err   error 
+	)
+	err = s.storage.Table("vote_opt_user").Where("vote_id = ? and user_id = ?", voteId, userId).Find(&items).Error
+	return items, err
+}
+
+// 投票结束（建议，通过脚本定期执行）
+func (s *MySQLVoteStore) EndVote(ctx context.Context) error {
+	if err := s.storage.Transaction(func(tx *gorm.DB) error {
+		var (
+			items []*types.Vote
+		)
+		// 筛选尚未结束的投票
+		if err := tx.Table("vote").Where("status = ?", 0).Find(&items).Error; err != nil {
+			return err
+		}
+
+		now := time.Now().Unix()
+		for _, vote := range items {
+			// 判断是否到期
+			if (vote.Time + vote.CreatedAt.Unix()) <= now {
+				if err := tx.Table("vote").Where("id = ?", vote.Id).Update("status", 1).Error; err != nil {
+					return err
+				}
+			}
+		}
+		
+		return nil 
+	}); err != nil {
+		return err
 	}
 
 	return nil 

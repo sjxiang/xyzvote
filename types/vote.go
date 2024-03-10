@@ -37,7 +37,7 @@ func (v *VoteOption) TableName() string {
 
 type VoteOptionByUser struct {
 	Id           int64     `json:"id"             gorm:"column:id;primary_key"`
-    UserId       int64     `json:"user_id"        gorm:"column:user_id"`
+    UserId       string    `json:"user_id"        gorm:"column:user_id"`
 	VoteId       int64     `json:"vote_id"        gorm:"column:vote_id"`
 	VoteOptionId int64     `json:"vote_option_id" gorm:"column:vote_option_id"`
     CreatedAt    time.Time `json:"created_at"     gorm:"column:created_at"`
@@ -53,9 +53,15 @@ type VoteParams struct {
 }
 
 type UpdateVoteParams struct {
-
+    VoteId    int64     `json:"vote_id"`
+    Title     string    `json:"title"`
+    Type      int32     `json:"type"`
+    Status    int32     `json:"status"`
+    Time      int64     `json:"time"`
 }
 
 type UpdateOptionParams struct {
-    
+    Name      string    `json:"name"`
+    Count     int32     `json:"count"`
+    VoteId    int64     `json:"vote_id"`
 }
