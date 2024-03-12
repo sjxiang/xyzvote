@@ -27,12 +27,12 @@ type VoteStore interface {
 }
 
 type MySQLVoteStore struct {
-	storage *gorm.DB
+	database *gorm.DB
 }
 
-func NewMySQLVoteStore(storage *gorm.DB) *MySQLVoteStore {
+func NewMySQLVoteStore(database *gorm.DB) *MySQLVoteStore {
 	return &MySQLVoteStore{
-		storage:   storage,
+		database: database,
 	}
 }
 
@@ -41,7 +41,7 @@ func (s *MySQLVoteStore) GetVotes(ctx context.Context) ([]*types.Vote, error) {
 		items []*types.Vote
 		err   error
 	)
-	err = s.storage.Table("vote").Find(&items).Error
+	err = s.database.Table("vote").Find(&items).Error
 	return items, err 
 }
 
@@ -51,7 +51,7 @@ func (s *MySQLVoteStore) GetVoteByID(ctx context.Context, id int64) (*types.Vote
 		item types.Vote
 		err  error
 	)
-	err = s.storage.Table("vote").Where("id = ?", id).First(&item).Error
+	err = s.database.Table("vote").Where("id = ?", id).First(&item).Error
 	return &item, err
 }
 
@@ -61,14 +61,14 @@ func (s *MySQLVoteStore) GetOptionsByVoteID(ctx context.Context, voteId int64) (
 		items []*types.VoteOption
 		err   error
 	)
-	err = s.storage.Table("vote_opt").Where("vote_id = ?", voteId).Find(&items).Error
+	err = s.database.Table("vote_opt").Where("vote_id = ?", voteId).Find(&items).Error
 	return items, err
 }
 
 // 新建用户投票记录
 func (s *MySQLVoteStore) InsertUserVoteRecord(ctx context.Context, userId string, voteId int64, options []int64) error {
 
-	if err := s.storage.Transaction(func(tx *gorm.DB) error {
+	if err := s.database.Transaction(func(tx *gorm.DB) error {
 
 		for _, val := range options {
 			// 更新投票数
@@ -133,7 +133,7 @@ func (s *MySQLVoteStore) InsertVoteAndOption(ctx context.Context, vote types.Vot
 
 	// 事务，匿名函数实现
 	// 开启
-	if err := s.storage.Transaction(func(tx *gorm.DB) error {
+	if err := s.database.Transaction(func(tx *gorm.DB) error {
 		
 		// 新增标题
 		if err := tx.Table("vote").Create(&vote).Error; err != nil {
@@ -169,37 +169,12 @@ func (s *MySQLVoteStore) InsertVoteAndOption(ctx context.Context, vote types.Vot
 
  
 func (s *MySQLVoteStore) UpdateVote(ctx context.Context, params types.UpdateVoteParams) error {
-	return s.storage.Table("vote").Save(&params).Error 
+	return s.database.Table("vote").Save(&params).Error 
 }
 
 
 func (s *MySQLVoteStore) UpdateOption(ctx context.Context, params types.UpdateOptionParams) error {
-	return s.storage.Table("vote_opt").Save(&params).Error 
-}
-
-func (s *MySQLVoteStore) DeleteVote(ctx context.Context, voteId int64) error {
-	if err := s.storage.Transaction(func(tx *gorm.DB) error {
-		// 1. 删除某项问卷调查
-		if err := tx.Delete(&types.Vote{}).Where("id = ?", voteId).Error; err != nil {
-			return err 
-		}
-
-		// 2. 删除该项问卷调查相关选项
-		if err := tx.Delete(&types.VoteOption{}).Where("vote_id = ?", voteId).Error; err != nil {
-			return err 
-		}
-
-		// 3. 删除该项问卷调查所有投票记录
-		if err := tx.Delete(&types.VoteOptionByUser{}).Where("vote_id = ?", voteId).Error; err != nil {
-			return err 
-		}
-
-		return nil 
-	}); err != nil {
-		return err 
-	}
-
-	return nil 
+	return s.database.Table("vote_opt").Save(&params).Error 
 }
 
 // 获取用户投票记录，GetUserVoteHistory
@@ -208,35 +183,15 @@ func (s *MySQLVoteStore) GetUserVoteRecord(ctx context.Context, userId string, v
 		items []*types.VoteOptionByUser
 		err   error 
 	)
-	err = s.storage.Table("vote_opt_user").Where("vote_id = ? and user_id = ?", voteId, userId).Find(&items).Error
+	err = s.database.Table("vote_opt_user").Where("vote_id = ? and user_id = ?", voteId, userId).Find(&items).Error
 	return items, err
 }
 
-// 投票结束（建议，通过脚本定期执行）
-func (s *MySQLVoteStore) EndVote(ctx context.Context) error {
-	if err := s.storage.Transaction(func(tx *gorm.DB) error {
-		var (
-			items []*types.Vote
-		)
-		// 筛选尚未结束的投票
-		if err := tx.Table("vote").Where("status = ?", 0).Find(&items).Error; err != nil {
-			return err
-		}
 
-		now := time.Now().Unix()
-		for _, vote := range items {
-			// 判断是否到期
-			if (vote.Time + vote.CreatedAt.Unix()) <= now {
-				if err := tx.Table("vote").Where("id = ?", vote.Id).Update("status", 1).Error; err != nil {
-					return err
-				}
-			}
-		}
-		
-		return nil 
-	}); err != nil {
-		return err
-	}
 
-	return nil 
+
+
+// 创建多条
+func (s *MySQLVoteStore) InsertOptions(ctx context.Context, items []*types.VoteOption) error {
+	return s.database.Table("vote_opt").Create(items).Error	
 }

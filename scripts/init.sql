@@ -40,7 +40,7 @@ CREATE TABLE `vote` (
     `title`      varchar(255) DEFAULT NULL COMMENT '标题', 
     `type`       int DEFAULT NULL COMMENT '0单选 1多选', 
     `status`     int DEFAULT NULL COMMENT '0正常 1超时', 
-    `time`       bigint DEFAULT NULL COMMENT '有效时长', 
+    `duration`   bigint DEFAULT NULL COMMENT '有效时长、持续时间', 
     `user_id`    bigint DEFAULT NULL COMMENT '创建人', 
     `created_at` datetime DEFAULT NULL, 
     `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
@@ -56,7 +56,7 @@ INSERT INTO `vote` (`title`, `type`, `status`, `time`, `user_id`, `created_at`, 
 VALUES ("today city walk", 0, 0, 86400, 10001, NOW(), NOW());
 
 
-CREATE TABLE `vote_opt` ( 
+CREATE TABLE `option` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
     `name` varchar(255) DEFAULT NULL COMMENT '选项名称', 
     `count` int DEFAULT NULL COMMENT '得票数', 
@@ -67,23 +67,23 @@ CREATE TABLE `vote_opt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT '投票选项表'; 
 
 -- 肯德基
-INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `option` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
 VALUES ("kfc", 0, 1, NOW(), NOW());
 
 -- 麦当劳
-INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `option` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
 VALUES ("m", 0, 1, NOW(), NOW());
 
 -- 沙县小吃
-INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `option` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
 VALUES ("shaxian", 0, 1, NOW(), NOW());
 
 
-CREATE TABLE `vote_opt_user` ( 
+CREATE TABLE `vote_record` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
     `user_id` varchar(64) DEFAULT NULL COMMENT '用户',
     `vote_id` bigint DEFAULT NULL COMMENT '投票项目', 
-    `vote_option_id` bigint DEFAULT NULL COMMENT '投票选项', 
+    `option_id` bigint DEFAULT NULL COMMENT '投票选项', 
     `created_at` datetime DEFAULT NULL COMMENT '投票时间',  
     PRIMARY KEY (`id`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT '用户投票详情表';

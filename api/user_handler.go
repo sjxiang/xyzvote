@@ -47,7 +47,7 @@ func (h *UserHandler) DoLogin(c *gin.Context)  {
 		return
 	}
 	
-	result, err := h.userStore.GetUserByUsername(context.Background(), params.Username)
+	result, err := h.userStore.GetUser(context.Background(), params.Username)
 	if err != nil {
 		// 检查 ErrRecordNotFound 错误
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -79,20 +79,6 @@ func (h *UserHandler) DoLogin(c *gin.Context)  {
 	})
 }	
 
-
-func (h *UserHandler) Admin(c *gin.Context)  {
-	result, err := h.userStore.GetUsers(context.Background())
-	if err != nil {
-		c.JSON(http.StatusBadGateway,  gin.H{
-			"msg": "db 查询失败",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"data": result,
-	})
-}
 
 // cookie 校验
 func (h *UserHandler) Check() gin.HandlerFunc {
@@ -153,7 +139,7 @@ func (h *UserHandler) Register(c *gin.Context) {
      */
 
 	// 校验用户是否存在，这种写法非常不安全。有严重的并发风险
-	result1, err := h.userStore.GetUserByUsername(context.Background(), params.Username)
+	result1, err := h.userStore.GetUser(context.Background(), params.Username)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(http.StatusBadGateway, gin.H{
 			"msg": "db 查询失败",

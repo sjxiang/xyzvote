@@ -10,7 +10,7 @@
 # redis-cli
 
 
-.PHONY: storage cache
+.PHONY: storage cache test
 
 
 storage:
@@ -29,3 +29,6 @@ cache:
 	-p 6379:6379 \
 	--name redis \
 	redis:7-alpine
+
+test:
+	go test -count=1 -v ./...

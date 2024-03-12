@@ -62,7 +62,7 @@ func (h *VoteHandler) DoVote(c *gin.Context)  {
 	// c 上下文
 	username := c.MustGet("creds").(string)
 
-	user, err := h.userStore.GetUserByUsername(context.Background(), username)
+	user, err := h.userStore.GetUser(context.Background(), username)
 	if err != nil {
 		// 检查 ErrRecordNotFound 错误
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -132,8 +132,21 @@ func (h *VoteHandler) GetVote(c *gin.Context)  {
 	)
 	id, err = strconv.ParseInt(idStr, 10, 64)
 	
-	*/
 	
+	换种写法，参考
+	GET /api/v1/vote/:id
+
+	var id := c.Param("id")
+
+	intID, err := strconv.Atoi(id)
+	if errr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid vote ID",
+		})
+		return
+	}
+
+	*/
 	var params types.GetVoteParams
 	if err := c.ShouldBind(&params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

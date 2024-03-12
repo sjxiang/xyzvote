@@ -16,6 +16,11 @@ import (
 )
 
 
+type Server struct {
+	
+}
+
+
 func main() {
 
 	var (
@@ -27,7 +32,7 @@ func main() {
 		dotCount, _   = strconv.ParseInt(Env("CaptchaDotCount", "80"), 10, 64)
 	)
 
-	storage, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,8 +48,8 @@ func main() {
 		captchaStore       = base64Captcha.DefaultMemStore  // 相关数据（e.g. 验证码）存储在内存中
 		captcha            = base64Captcha.NewCaptcha(&captchaDigitDriver, captchaStore)
 		
-		userStore          = db.NewMySQLUserStore(storage)
-		voteStore          = db.NewMySQLVoteStore(storage)
+		userStore          = db.NewMySQLUserStore(database)
+		voteStore          = db.NewMySQLVoteStore(database)
 		
 		userHandler        = api.NewUserHandler(userStore, captcha)
 		voteHandler        = api.NewVoteHandler(voteStore, userStore)

@@ -21,10 +21,35 @@ import (
 )
 
 
-// 登陆页面
+type xxxRequest struct {
+
+}
+
+type xxxResponse struct {
+
+}
+
+
+
+// 获取登录页面
 func (h *UserHandler) GetLogin(c *gin.Context)  {
 	c.HTML(http.StatusOK, "login.html", nil)
 }	
 
 
-// 用户登录
+// 用户登录（通过账号，用户名和密码）
+func (h *UserHandler) DoLoginByAccount(c *gin.Context) {
+
+}
+
+
+// 用户登录（通过发送邮件验证码）
+func (h *UserHandler) DoLoginByEmailOTP(c *gin.Context) {
+
+}
+
+// 用户登录（通过第三方授权）
+func (h *UserHandler) DoLoginByGithub(c *gin.Context) {
+
+}
+
