@@ -20,7 +20,7 @@ func (u *User) TableName() string {
 	return consts.UserTableName
 }
 
-// 投票设置
+// 问卷表单设置
 type Vote struct {
 	Id        int64     `json:"id,omitempty" gorm:"column:id;primary_key"`
     Title     string    `json:"title"        gorm:"column:title"`
@@ -37,7 +37,7 @@ func (v *Vote) TableName() string {
 }
 
 
-// 选项统计分析
+// 问卷表单选项
 type Option struct {
     Id        int64     `json:"id"           gorm:"column:id;primary_key"`
     Name      string    `json:"name"         gorm:"column:name"`

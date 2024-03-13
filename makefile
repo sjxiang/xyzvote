@@ -1,34 +1,35 @@
 
 
-# 登录 MySQL 控制台
-# docker exec -it mysql sh
-# mysql -uroot -p
-# my-secret-pw
 
-# 登录 Redis 控制台
-# docker exec -it redis sh
+# 拉取镜像
+# docker pull bitnami/mysql:latest
+# docker pull bitnami/redis:latest
+
+# 登录控制台
+# docker exec -it storage sh
+# mysql -uroot -pmy-secret-pw
+# docker exec -it cache sh
 # redis-cli
 
 
-.PHONY: storage cache test
-
-
-storage:
-	docker run \
-	-d \
-	-p 3306:3306 \
-	--name mysql \
-	-e MYSQL_ROOT_PASSWORD=my-secret-pw \
-	-e MYSQL_DATABASE=xyz_vote \
-	mysql:8.0.29
+mysql:
+	docker run -itd \
+		--name storage \
+		-p 13306:3306 \
+		-e ALLOW_EMPTY_PASSWORD=yes \
+		-e MYSQL_ROOT_PASSWORD=my-secret-pw \
+		bitnami/mysql:latest
 	
-
-cache:
-	docker run \
-	-d \
-	-p 6379:6379 \
-	--name redis \
-	redis:7-alpine
-
+redis:
+	docker run -itd \
+		--name cache \
+		-p 6379:6379 \
+		-e ALLOW_EMPTY_PASSWORD=yes \
+		bitnami/redis:latest
+	
 test:
 	go test -count=1 -v ./...
+
+
+
+.PHONY: mysql redis test 

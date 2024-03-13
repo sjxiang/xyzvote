@@ -1,5 +1,13 @@
 package db
 
+import "context"
+
+type UserStore interface {
+	GetUser(ctx context.Context, username string) (*User, error) 
+	CreateUser(ctx context.Context, arg CreateUserParams) (*User, error)
+	ListUser(ctx context.Context, arg ListUserParams) ([]*User, error)
+}
+
 /*
 	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Account, error)
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)

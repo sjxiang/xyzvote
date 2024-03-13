@@ -45,7 +45,7 @@ CREATE TABLE `vote` (
     `created_at` datetime DEFAULT NULL, 
     `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
     PRIMARY KEY (`id`) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT = '投票活动表'; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT = '投票问卷表单设置'; 
 
 -- 晚饭吃什么
 INSERT INTO `vote` (`title`, `type`, `status`, `time`, `user_id`, `created_at`, `updated_at`)
@@ -56,30 +56,30 @@ INSERT INTO `vote` (`title`, `type`, `status`, `time`, `user_id`, `created_at`, 
 VALUES ("today city walk", 0, 0, 86400, 10001, NOW(), NOW());
 
 
-CREATE TABLE `option` ( 
+CREATE TABLE `vote_opt` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
-    `name` varchar(255) DEFAULT NULL COMMENT '选项名称', 
-    `count` int DEFAULT NULL COMMENT '得票数', 
-    `vote_id` bigint DEFAULT NULL COMMENT '投票活动', 
+    `name` varchar(255) DEFAULT NULL COMMENT '投票选项名称', 
+    `count` int DEFAULT NULL COMMENT '选项的投票数量', 
+    `vote_id` bigint DEFAULT NULL COMMENT, 
     `created_at` datetime DEFAULT NULL, 
     `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
     PRIMARY KEY (`id`) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT '投票选项表'; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT '投票问卷选项表'; 
 
 -- 肯德基
-INSERT INTO `option` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
 VALUES ("kfc", 0, 1, NOW(), NOW());
 
 -- 麦当劳
-INSERT INTO `option` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
 VALUES ("m", 0, 1, NOW(), NOW());
 
 -- 沙县小吃
-INSERT INTO `option` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
 VALUES ("shaxian", 0, 1, NOW(), NOW());
 
 
-CREATE TABLE `vote_record` ( 
+CREATE TABLE `vote_opt_user` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
     `user_id` varchar(64) DEFAULT NULL COMMENT '用户',
     `vote_id` bigint DEFAULT NULL COMMENT '投票项目', 

@@ -52,6 +52,7 @@ type RegisterUserParams struct {
 	Username         string    `json:"username" binding:"required,min=8"`         // 用户名不为空，最少 8 位
     Password         string    `json:"password" binding:"required,gte=8,lte=16"`  // 密码不为空，8 ~ 16 位，不能为纯数字
 	ConfirmPassword  string    `json:"confirm_password" binding:"required,gte=8,lte=16"`
+	Email            string    `json:"email" binding:"required,email"`
 }
 
 type VerifyOTPParams struct {

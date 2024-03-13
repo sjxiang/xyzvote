@@ -6,6 +6,7 @@ import (
 	"errors"
 	
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 
 	"xyzvote/db"
 )
@@ -48,7 +49,9 @@ func newListUserResponse(items []*db.User) []userResponse {
 func (h *UserHandler) Admin(c *gin.Context) {
 	var req listUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "传参错误",
+		})
 		return
 	}
 
@@ -64,7 +67,11 @@ func (h *UserHandler) Admin(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, errorResponse(err))
+		log.Error().Err(err).Msg("db cannot list user")
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "服务器内部错误",
+		})
 		return
 	}
 

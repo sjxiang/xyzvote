@@ -13,7 +13,7 @@ import (
 )
 
 /*
-
+	var item User
 	db.First(&item)
 
 		1. raw-sql
@@ -24,13 +24,28 @@ import (
 		特征：限定词较多
 
 
+	var items []*User
 	db.Find(&items)
 		1. raw-sql
 		SELECT * FROM `user`
 
+		
+	First 和 Find，传参（指针变量），即内存地址；
+	
+	都对 `*`、`**` 做了适配，不管三七二十七，先 & 再说
 
+	gorm Find 对 nil 做了适配，根据变量内存地址 reflect 出原型，再分配一个空切片替代
 
-*/
+	代码风格
+	
+	# 1
+	var items []*User  // 申明变量，但未初始化；即未分配内存，nil
+
+	# 2 推荐
+	items = make([]*User, 0)  // 分配了内存
+	
+	*/
+
 
 func (s *MySQLUserStore) GetUser(ctx context.Context, username string) (*User, error) {
 	
@@ -74,7 +89,7 @@ type CreateUserParams struct {
 	Username       string    `json:"username"`
 	HashedPassword string    `json:"hashed_password"`
 	Email          string    `json:"email"`
-	CreatedAt      time.Time `json:"created_at`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 func (s *MySQLUserStore) CreateUser(ctx context.Context, arg CreateUserParams) (*User, error) {
@@ -110,9 +125,6 @@ func (s *MySQLUserStore) CreateUser(ctx context.Context, arg CreateUserParams) (
 	return &item, nil 
 }
 
-func (s *MySQLUserStore) XCreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	panic("implement me!")
-}
 
 func (s *MySQLUserStore) CreateUserTx(ctx context.Context, arg CreateUserParams) (User, error) {
 	panic("implement me!") 
@@ -139,13 +151,5 @@ func (s *MySQLUserStore) ListUser(ctx context.Context, arg ListUserParams) ([]*U
 	return items, nil 
 }
 
-
-// var (
-// 	err   error	
-// 	items []*types.User  // 风格统一
-// )
-
-// err = s.database.Debug().Table("user").Find(&items).Error
-// return items, err
 
 // 游标

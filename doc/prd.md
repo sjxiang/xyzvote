@@ -58,3 +58,5 @@ Find
 前端拿到 captcha_id 和 base64 字符串，渲染成图片；
 用户输入。
 
+
+https://www.toolhelper.cn/Image/Base64ToImage
