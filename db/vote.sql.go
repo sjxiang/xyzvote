@@ -22,18 +22,6 @@ func (s *MySQLVoteStore) ListForms(ctx context.Context) ([]*Form, error) {
 	return items, nil
 }
 
-func (s *MySQLVoteStore) GetForm(ctx context.Context, id int64) (*Form, error) {
-	var item Form
-	if err := s.database.Debug().Table(consts.FormTableName).Where("id = ?", id).First(&item).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrRecordNoFound
-		} else {
-			return nil, err
-		}	
-	}
-
-	return &item, nil 
-}
 
 type GetUserVoteRecordParams struct {
 	UserId string
@@ -70,6 +58,19 @@ func (s *MySQLVoteStore) UpdateForm(ctx context.Context, arg UpdateFormParams) e
 }
 
 
+func (s *MySQLVoteStore) GetForm(ctx context.Context, id int64) (*Form, error) {
+	var item Form
+	if err := s.database.Debug().Table(consts.FormTableName).Where("id = ?", id).First(&item).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNoFound
+		} else {
+			return nil, err
+		}	
+	}
+
+	return &item, nil 
+}
+
 func (s *MySQLVoteStore) GetOptionByFormId(ctx context.Context, formId int64) ([]*Option, error) {
 	items := make([]*Option, 0)
 	if err := s.database.Debug().Table(consts.OptionTableName).Where("form_id = ?", formId).Find(&items).Error; err != nil {
@@ -81,4 +82,22 @@ func (s *MySQLVoteStore) GetOptionByFormId(ctx context.Context, formId int64) ([
 
 	return items, nil 
 }
-	
+
+/*
+
+SELECT 
+	* 
+FROM
+	`form` 
+JOIN
+	`form_opt` 
+ON
+	`form`.`id` = `form_opt`.`form_id` and `form`.`id`=6;
+
++----+-----------------+------+--------+----------+--------------------------------------+---------------------+---------------------+----+----------+------------+---------+---------------------+---------------------+
+| id | title           | type | status | duration | user_id                              | created_at          | updated_at          | id | name     | vote_count | form_id | created_at          | updated_at          |
++----+-----------------+------+--------+----------+--------------------------------------+---------------------+---------------------+----+----------+------------+---------+---------------------+---------------------+
+|  6 | today city walk |    0 |      0 |    86400 | f2d274f5-bb8b-4175-a60b-a2d113df4818 | 2024-03-14 08:26:14 | 2024-03-14 08:26:14 |  9 | nanjing  |          1 |       6 | 2024-03-14 08:26:14 | 2024-03-14 15:27:33 |
+|  6 | today city walk |    0 |      0 |    86400 | f2d274f5-bb8b-4175-a60b-a2d113df4818 | 2024-03-14 08:26:14 | 2024-03-14 08:26:14 | 10 | shanghai |          1 |       6 | 2024-03-14 08:26:14 | 2024-03-14 15:27:33 |
++----+-----------------+------+--------+----------+--------------------------------------+---------------------+---------------------+----+----------+------------+---------+---------------------+---------------------+
+*/

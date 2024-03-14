@@ -1,14 +1,16 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mojocn/base64Captcha"
-	"gorm.io/gorm"
-	"gorm.io/driver/mysql"
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	"xyzvote/api"
 	"xyzvote/consts"
@@ -17,6 +19,7 @@ import (
 
 
 type Server struct {
+
 	
 }
 
@@ -28,6 +31,17 @@ func main() {
 	database, err := gorm.Open(mysql.Open(consts.MySQLDefaultDSN), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db")
+	}
+
+	cache := redis.NewClient(&redis.Options{
+		Addr:     consts.RedisServerAddr,
+		Password: consts.RedisPassword,
+		DB:       consts.RedisDatabaseNum,
+	})
+
+	_, err = cache.Ping(context.TODO()).Result()
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot connect to cache")
 	}
 	
 	var (
@@ -44,7 +58,7 @@ func main() {
 		userStore          = db.NewMySQLUserStore(database)
 		voteStore          = db.NewMySQLVoteStore(database)
 		
-		userHandler        = api.NewUserHandler(userStore, captcha)
+		userHandler        = api.NewUserHandler(userStore, cache, captcha)
 		voteHandler        = api.NewVoteHandler(voteStore, userStore)
 		
 		app                = gin.Default()
@@ -59,14 +73,15 @@ func main() {
 	apiv1.GET("/user/login", userHandler.LoginPage)
 	apiv1.POST("/user/login", userHandler.LoginByAccount)
 
-	apiv1.GET("/ranklist", voteHandler.RankList)
-	apiv1.GET("/form", voteHandler.GetVote)
-
 	apiv1.Use(userHandler.Check())
 
 	apiv1.GET("/user/me", userHandler.Me)
 	apiv1.POST("/user/admin", userHandler.Admin)
 	apiv1.GET("/user/logout", userHandler.Logout)
+	
+	apiv1.GET("/ranklist", voteHandler.RankList)
+	apiv1.GET("/vote", voteHandler.GetVoteInfo)
+
 	
 	app.Run(":8080")
 }

@@ -39,7 +39,7 @@ func (s *MySQLVoteStore) DoVoteTx(ctx context.Context, arg DoVoteTxParams) error
 			return err
 		}
 		if len(history) > 0 {  
-			return ErrAlreadyExists  // 已投
+			return ErrDuplicateVoteRecord  // 已投
 		}
 
 		for _, optID := range arg.OptIDs {
@@ -95,6 +95,47 @@ VALUES
 */
 
 func (s *MySQLVoteStore) XDoVoteTx(ctx context.Context, arg DoVoteTxParams) error {
+	if err := s.database.Debug().Transaction(func(tx *gorm.DB) error {
+
+		var form Form
+		if err := tx.Raw("select * from form where id = ?", arg.FormId).Scan(&form).Error; err != nil {
+			return err
+		}
+		if form.Id == 0 {
+			return ErrRecordNoFound
+		}
+
+		history := make([]*VoteRecord, 0)
+		if err := tx.Raw("select * from form_opt_user where form_id = ? and user_id = ?", arg.FormId, arg.UserId).Scan(&history).Error; err != nil {
+			return err
+		}
+		if len(history) > 0 {  
+			return ErrDuplicateVoteRecord
+		}
+
+		for _, optID := range arg.OptIDs {
+			
+			if err := tx.Exec("update form_opt set count = count+1 where id = ? limit 1", optID).Error; err != nil {
+				return err
+			}
 	
+			var item VoteRecord
+			
+			item.FormId    = arg.FormId
+			item.OptionId  = optID
+			item.UserId    = arg.UserId
+			item.CreatedAt = arg.CreatedAt
+
+			// 投票记录
+			if err := tx.Table(consts.VoteRecordTableName).Create(&item).Error; err != nil {
+				return err
+			}
+		}
+		
+		return nil
+	}); err != nil {
+		return err 
+	}
+
 	return nil 
 }

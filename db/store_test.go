@@ -26,8 +26,8 @@ func TestDoVote(t *testing.T) {
 	voteStore := prepareVote(t)
 	arg := DoVoteTxParams{
 		UserId:    "f2d274f5-bb8b-4175-a60b-a2d113df4818",
-		FormId:    2,
-		OptIDs:    []int64{1, 2},
+		FormId:    6,
+		OptIDs:    []int64{9, 10},
 		CreatedAt: time.Now(),
 	}
 

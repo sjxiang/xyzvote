@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// 请求图片 otp
+// 请求图片 otp（限流）
 func (h *UserHandler) GenerateImageOTP(c *gin.Context) {
 	var (
 		id     string

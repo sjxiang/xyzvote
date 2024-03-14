@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	ErrRecordNoFound      = errors.New("db: no matching record found")
-	ErrInvalidCredentials = errors.New("db: invalid credentials")
-	ErrDuplicateEmail     = errors.New("db: duplicate email")
-	ErrDuplicateUsername  = errors.New("db: duplicate username")
-	ErrDuplicateUserId    = errors.New("db: duplicate user_id")
-	ErrAlreadyExists      = errors.New("db: already exists")
+	ErrRecordNoFound       = errors.New("db: no matching record found")
+	ErrInvalidCredentials  = errors.New("db: invalid credentials")
+	ErrDuplicateEmail      = errors.New("db: duplicate email")
+	ErrDuplicateUsername   = errors.New("db: duplicate username")
+	ErrDuplicateUserId     = errors.New("db: duplicate user_id")
+	ErrDuplicateVoteRecord = errors.New("db: already exists")
 )
 
 

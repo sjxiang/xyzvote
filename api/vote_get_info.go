@@ -11,11 +11,11 @@ import (
 )
 
 type GetVoteRequest struct {
-	ID int64 `form:"id" url:"id" binding:"required,min=1"`
+	FormID int64 `form:"form_id" url:"form_id" binding:"required,min=1"`
 }
 
 // 查询投票详情
-func (h *VoteHandler) GetVote(c *gin.Context) {
+func (h *VoteHandler) GetVoteInfo(c *gin.Context) {
 	var req GetVoteRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -24,7 +24,7 @@ func (h *VoteHandler) GetVote(c *gin.Context) {
 		return
 	}
 
-	form, err := h.voteStore.GetForm(context.TODO(), req.ID)
+	form, err := h.voteStore.GetForm(context.TODO(), req.FormID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNoFound) {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -40,7 +40,7 @@ func (h *VoteHandler) GetVote(c *gin.Context) {
 		return
 	}
 
-	options, err := h.voteStore.GetOptionByFormId(context.TODO(), req.ID)
+	options, err := h.voteStore.GetOptionByFormId(context.TODO(), req.FormID)
 	log.Error().Err(err).Msg("what happened")
 	
 	if err != nil && !errors.Is(err, db.ErrRecordNoFound){

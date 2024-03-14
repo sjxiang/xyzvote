@@ -23,7 +23,7 @@ mysql:
 redis:
 	docker run -itd \
 		--name cache \
-		-p 6379:6379 \
+		-p 16379:6379 \
 		-e ALLOW_EMPTY_PASSWORD=yes \
 		bitnami/redis:latest
 	

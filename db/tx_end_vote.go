@@ -51,7 +51,6 @@ select * from vote where status = ?
 	endVote2 = `
 update vote set status = 1 where id = ? limit 1
 `
-
 )
 
 // 原生 raw sql 优化

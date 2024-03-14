@@ -49,3 +49,10 @@ curl --location --request POST 'localhost:8080/api/v1/user/admin' \
 curl --location --request GET 'localhost:8080/api/v1/user/logout' \
 --header 'Cookie: credentials=shgqmrf19; path=/' 
 
+# 查看投票活动清单
+curl --location --request GET 'localhost:8080/api/v1/ranklist' \
+--header 'Cookie: credentials=shgqmrf19; path=/' 
+
+# 查看投票详情
+curl --location --request GET 'localhost:8080/api/v1/vote?form_id=1' \
+--header 'Cookie: credentials=shgqmrf19; path=/' 

@@ -9,7 +9,7 @@
 
     <!-- 在 tmpl 中，使用遍历 -->
     {{range $key,$value := .form}}
-    <h2><a href="/api/v1/form?id={{$value.Id}}">{{$value.Title}}</a></h2>
+    <h2><a href="/api/v1/vote?form_id={{$value.Id}}">{{$value.Title}}</a></h2>
     {{end}}
 
     
