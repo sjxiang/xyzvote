@@ -3,9 +3,9 @@ package consts
 
 const (
 	UserTableName              = "user"
-	VoteTableName              = "vote"
-	OptionTableName            = "vote_opt"
-	VoteRecordTableName        = "vote_opt_user"
+	FormTableName              = "form"
+	OptionTableName            = "form_opt"
+	VoteRecordTableName        = "form_opt_user"
 
 	MySQLDefaultDSN            = "root:my-secret-pw@tcp(127.0.0.1:13306)/xyz_vote?charset=utf8&parseTime=True&loc=Local"
 	

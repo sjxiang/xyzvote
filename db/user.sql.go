@@ -52,7 +52,7 @@ func (s *MySQLUserStore) GetUser(ctx context.Context, username string) (*User, e
 	var item User
 	
 	if err := s.database.Debug().WithContext(ctx).
-		Table(consts.UserTableName).Where("name = ?", username).First(&item).Error; 
+		Table(consts.UserTableName).Where("username = ?", username).First(&item).Error; 
 		err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrInvalidCredentials

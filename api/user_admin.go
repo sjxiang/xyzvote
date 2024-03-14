@@ -13,8 +13,8 @@ import (
 
 // 后台
 type listUserRequest struct {
-	PageID   int `form:"page_id" binding:"required,min=1"`
-	PageSize int `form:"page_size" binding:"required,min=5,max=10"`
+	PageID   int `json:"page_id" binding:"required,min=1"`
+	PageSize int `json:"page_size" binding:"required,min=5,max=10"`
 }
 
 

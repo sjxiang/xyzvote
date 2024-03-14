@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -58,18 +59,25 @@ func (h *UserHandler) LoginByAccount(c *gin.Context) {
 		}
 
 		log.Error().Err(err).Msg("db cannot get user")
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "服务器内部错误",
 		})
 		return
 	}
 
-	if user.EncryptedPassword != req.Password {
+	match, err := PasswordMatches(user.EncryptedPassword, req.Password)
+	if err != nil {
+		log.Error().Err(err).Msg("bcrypt cannot compare password")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "服务器内部错误",
+		})
+		return
+	}
+	if !match {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "账号密码错误",
 		})
-		return
+		return		
 	}
 	
 	oneHour := int(time.Second * 60 * 60)
@@ -79,3 +87,19 @@ func (h *UserHandler) LoginByAccount(c *gin.Context) {
 		"msg": "登录成功",
 	})
 }
+
+func PasswordMatches(hashedPassword, plainText string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainText))
+	if err != nil {
+		switch {
+		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+			// invalid password
+			return false, nil
+		default:
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+

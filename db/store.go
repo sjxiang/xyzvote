@@ -8,6 +8,21 @@ type UserStore interface {
 	ListUser(ctx context.Context, arg ListUserParams) ([]*User, error)
 }
 
+type VoteStore interface {
+	DoVoteTx(ctx context.Context, arg DoVoteTxParams) error
+	CreateFormAndOptionTx(ctx context.Context, arg CreateFormAndOptionTxParams) error
+	DeleteVoteTx(ctx context.Context, formId int64) error
+	EndVoteTx(ctx context.Context) error
+
+
+	ListForms(ctx context.Context) ([]*Form, error)
+	GetForm(ctx context.Context, id int64) (*Form, error)
+	GetOptionByFormId(ctx context.Context, formId int64) ([]*Option, error)
+	GetUserVoteRecord(ctx context.Context, arg GetUserVoteRecordParams) ([]*VoteRecord, error)
+
+	UpdateForm(ctx context.Context, arg UpdateFormParams) error
+}
+
 /*
 	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Account, error)
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)

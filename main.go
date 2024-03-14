@@ -42,10 +42,10 @@ func main() {
 		captcha            = base64Captcha.NewCaptcha(&captchaDigitDriver, captchaStore)
 		
 		userStore          = db.NewMySQLUserStore(database)
-		// voteStore          = db.NewMySQLVoteStore(database)
+		voteStore          = db.NewMySQLVoteStore(database)
 		
 		userHandler        = api.NewUserHandler(userStore, captcha)
-		// voteHandler        = api.NewVoteHandler(voteStore, userStore)
+		voteHandler        = api.NewVoteHandler(voteStore, userStore)
 		
 		app                = gin.Default()
 		apiv1              = app.Group("/api/v1")
@@ -56,16 +56,18 @@ func main() {
 	apiv1.GET("/otp/gen", userHandler.GenerateImageOTP)
 	apiv1.POST("/otp/verify", userHandler.VerifyImageOTP)
 	apiv1.POST("/user/register", userHandler.Register)	
+	apiv1.GET("/user/login", userHandler.LoginPage)
 	apiv1.POST("/user/login", userHandler.LoginByAccount)
+
+	apiv1.GET("/ranklist", voteHandler.RankList)
+	apiv1.GET("/form", voteHandler.GetVote)
 
 	apiv1.Use(userHandler.Check())
 
 	apiv1.GET("/user/me", userHandler.Me)
-	apiv1.GET("/user/admin", userHandler.Admin)
-
-
-
-
+	apiv1.POST("/user/admin", userHandler.Admin)
+	apiv1.GET("/user/logout", userHandler.Logout)
+	
 	app.Run(":8080")
 }
 

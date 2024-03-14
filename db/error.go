@@ -12,6 +12,7 @@ var (
 	ErrDuplicateEmail     = errors.New("db: duplicate email")
 	ErrDuplicateUsername  = errors.New("db: duplicate username")
 	ErrDuplicateUserId    = errors.New("db: duplicate user_id")
+	ErrAlreadyExists      = errors.New("db: already exists")
 )
 
 

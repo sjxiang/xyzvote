@@ -8,5 +8,5 @@ import (
 
 func (h *UserHandler) Logout(c *gin.Context) {
 	c.SetCookie("credentials", "", 3600, "/", "", true, false)
-	c.Redirect(http.StatusPermanentRedirect, "/api/v1/login")
+	c.Redirect(http.StatusPermanentRedirect, "/api/v1/user/login")
 }

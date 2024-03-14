@@ -25,64 +25,52 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT = '用户表';
 
 
--- INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
--- VALUES (10001, "sjxiang1997", "shgqmrf19", "1535484943@qq.com");
+INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
+VALUES ("ea7ee4ac-4b0b-4f78-846e-26e7ea70411d", "sjxiang1997", "123456789qwe", "1535484943@qq.com");
 
--- INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
--- VALUES (10002, "admin123", "123456qwe", "test@qq.com");
+INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
+VALUES ("f2d274f5-bb8b-4175-a60b-a2d113df4818", "sjxiang2024", "123456789qwe", "cisco@qq.com");
 
 
--- INSERT INTO `user` (`user_id`, `username`, `password`, `email`)
--- VALUES (10004, "admin123", "123456qwe", "test@qq.com");
-
-CREATE TABLE `vote` ( 
+CREATE TABLE `form` ( 
     `id`         bigint NOT NULL AUTO_INCREMENT, 
     `title`      varchar(255) DEFAULT NULL COMMENT '标题', 
     `type`       int DEFAULT NULL COMMENT '0单选 1多选', 
     `status`     int DEFAULT NULL COMMENT '0正常 1超时', 
     `duration`   bigint DEFAULT NULL COMMENT '有效时长、持续时间', 
-    `user_id`    bigint DEFAULT NULL COMMENT '创建人', 
+    `user_id`    varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
     `created_at` datetime DEFAULT NULL, 
     `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
     PRIMARY KEY (`id`) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT = '投票问卷表单设置'; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT = '表单设置'; 
 
 -- 晚饭吃什么
-INSERT INTO `vote` (`title`, `type`, `status`, `time`, `user_id`, `created_at`, `updated_at`)
-VALUES ("today eat food", 0, 0, 86400, 10001, NOW(), NOW());
-
--- 周末 city walk
-INSERT INTO `vote` (`title`, `type`, `status`, `time`, `user_id`, `created_at`, `updated_at`)
-VALUES ("today city walk", 0, 0, 86400, 10001, NOW(), NOW());
+INSERT INTO `form` (`title`, `type`, `status`, `duration`, `user_id`, `created_at`, `updated_at`)
+VALUES ("today eat food", 0, 0, 86400, "ea7ee4ac-4b0b-4f78-846e-26e7ea70411d", NOW(), NOW());
 
 
-CREATE TABLE `vote_opt` ( 
+CREATE TABLE `form_opt` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
-    `name` varchar(255) DEFAULT NULL COMMENT '投票选项名称', 
-    `count` int DEFAULT NULL COMMENT '选项的投票数量', 
-    `vote_id` bigint DEFAULT NULL COMMENT, 
+    `name` varchar(255) DEFAULT NULL COMMENT '选项名称', 
+    `vote_count` int DEFAULT NULL COMMENT '选项的投票数量', 
+    `form_id` bigint DEFAULT NULL, 
     `created_at` datetime DEFAULT NULL, 
     `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, 
     PRIMARY KEY (`id`) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT '投票问卷选项表'; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT '问卷选项'; 
 
 -- 肯德基
-INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `form_opt` (`name`, `vote_count`, `form_id`, `created_at`, `updated_at`)
 VALUES ("kfc", 0, 1, NOW(), NOW());
 
--- 麦当劳
-INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
-VALUES ("m", 0, 1, NOW(), NOW());
-
--- 沙县小吃
-INSERT INTO `vote_opt` (`name`, `count`, `vote_id`, `created_at`, `updated_at`)
+INSERT INTO `form_opt` (`name`, `vote_count`, `form_id`, `created_at`, `updated_at`)
 VALUES ("shaxian", 0, 1, NOW(), NOW());
 
 
-CREATE TABLE `vote_opt_user` ( 
+CREATE TABLE `form_opt_user` ( 
     `id` bigint NOT NULL AUTO_INCREMENT, 
-    `user_id` varchar(64) DEFAULT NULL COMMENT '用户',
-    `vote_id` bigint DEFAULT NULL COMMENT '投票项目', 
+    `user_id`   varchar(64) NOT NULL DEFAULT '' COMMENT '投票用户',
+    `form_id`   bigint DEFAULT NULL COMMENT '投票项目', 
     `option_id` bigint DEFAULT NULL COMMENT '投票选项', 
     `created_at` datetime DEFAULT NULL COMMENT '投票时间',  
     PRIMARY KEY (`id`) 
