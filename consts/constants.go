@@ -2,6 +2,8 @@ package consts
 
 
 const (
+	HTTPServerAddres           = ":8090"
+	
 	UserTableName              = "user"
 	FormTableName              = "form"
 	OptionTableName            = "form_opt"

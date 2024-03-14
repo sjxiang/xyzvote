@@ -18,14 +18,27 @@ import (
 )
 
 
-type Server struct {
+func main() {
+	srv, err := NewServer()
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot create server")
+	}
 
-	
+	err = srv.Start(consts.HTTPServerAddres)
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot start server")
+	}
 }
 
 
-func main() {
+type Server struct {
+	userHandler *api.UserHandler
+	voteHandler *api.VoteHandler
+	router      *gin.Engine
+}
 
+func NewServer() (*Server, error) {
+	
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	database, err := gorm.Open(mysql.Open(consts.MySQLDefaultDSN), &gorm.Config{})
@@ -43,7 +56,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to cache")
 	}
-	
+
 	var (
 		captchaDigitDriver = base64Captcha.DriverDigit{  // 数字
 			Height:   consts.CaptchaHeight,  
@@ -60,45 +73,43 @@ func main() {
 		
 		userHandler        = api.NewUserHandler(userStore, cache, captcha)
 		voteHandler        = api.NewVoteHandler(voteStore, userStore)
-		
-		app                = gin.Default()
-		apiv1              = app.Group("/api/v1")
 	)
 
-	app.LoadHTMLGlob("api/views/*")
+	srv := &Server{
+		userHandler: userHandler,
+		voteHandler: voteHandler,
+	}
 
-	apiv1.GET("/otp/gen", userHandler.GenerateImageOTP)
-	apiv1.POST("/otp/verify", userHandler.VerifyImageOTP)
-	apiv1.POST("/user/register", userHandler.Register)	
-	apiv1.GET("/user/login", userHandler.LoginPage)
-	apiv1.POST("/user/login", userHandler.LoginByAccount)
-
-	apiv1.Use(userHandler.Check())
-
-	apiv1.GET("/user/me", userHandler.Me)
-	apiv1.POST("/user/admin", userHandler.Admin)
-	apiv1.GET("/user/logout", userHandler.Logout)
-	
-	apiv1.GET("/ranklist", voteHandler.RankList)
-	apiv1.GET("/vote", voteHandler.GetVoteInfo)
-
-	
-	app.Run(":8080")
+	srv.setupRouter()
+	return srv, nil 
 }
 
 
+func (server *Server) setupRouter() {
+	router := gin.Default()
+	
+	router.LoadHTMLGlob("api/views/*")
 
+	apiv1 := router.Group("/api/v1")
 
-// func runGinServer(config util.Config, store db.Store) {
-// 	server, err := api.NewServer(config, store)
-// 	if err != nil {
-// 		log.Fatal().Err(err).Msg("cannot create server")
-// 	}
+	apiv1.GET("/otp/gen", server.userHandler.GenerateImageOTP)
+	apiv1.POST("/otp/verify", server.userHandler.VerifyImageOTP)
+	apiv1.POST("/user/register", server.userHandler.Register)	
+	apiv1.GET("/user/login", server.userHandler.LoginPage)
+	apiv1.POST("/user/login", server.userHandler.LoginByAccount)
 
-// 	err = server.Start(config.HTTPServerAddress)
-// 	if err != nil {
-// 		log.Fatal().Err(err).Msg("cannot start server")
-// 	}
-// }
+	apiv1.Use(server.userHandler.Check())
 
-// dependency injection，依赖注入
+	apiv1.GET("/user/me", server.userHandler.Me)
+	apiv1.POST("/user/admin", server.userHandler.Admin)
+	apiv1.GET("/user/logout", server.userHandler.Logout)
+	
+	apiv1.GET("/ranklist", server.voteHandler.RankList)
+	apiv1.GET("/vote", server.voteHandler.GetVoteInfo)
+	
+	server.router = router
+}
+
+func (server *Server) Start(address string) error {
+	return server.router.Run(address)
+}
